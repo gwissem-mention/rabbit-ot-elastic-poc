@@ -42,4 +42,3 @@ services:
             - ./docker/elastic/elasticsearch.yml:/etc/elasticsearch/elasticsearch.yml
             - ./elk/logstash:/etc/logstash
             - ./elk/logstash/patterns:/opt/logstash/patterns
-

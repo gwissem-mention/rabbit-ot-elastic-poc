@@ -51,7 +51,6 @@ class BulkDocumentConsumer implements ConsumerInterface
 
         echo "Found the task ! \n";
         $documents = $this->getTaskDocuments($task);
-        echo sprintf("Got %d documents to index \n", count($documents));
         $this->bulkIndex($documents);
 
         $this->markTaskAsDone($task);
@@ -85,7 +84,7 @@ class BulkDocumentConsumer implements ConsumerInterface
     protected function bulkIndex($documents)
     {
         $index = $this->indexManager->getIndex('categories_en');
-        $docType = $index->getType('attribute');
+        $docType = $index->getType('category');
 
         $this->createIndex($index);
         echo "Start bulk index \n";

@@ -89,6 +89,7 @@ class PopulateCommand extends ContainerAwareCommand
                     'category_name' => $data[1],
                     'category_description' => $data[2],
                     'category_order' => $data[3],
+                    'category_ranking' => $data[3],
                 ];
 
                 $elasticaDoc = new ElasticDocument($data[0], $attributeData);
@@ -142,10 +143,6 @@ class PopulateCommand extends ContainerAwareCommand
 
         $msg = [
             'task_id' => $task->getId(),
-            'start_id' => $task->getStartId(),
-            'end_id' => $task->getEndId(),
-            'type' => $task->getDocType(),
-            'index' => $task->getIndexName(),
         ];
         $this->getContainer()->get('bulk_document_producer')->publish(serialize($msg));
     }
