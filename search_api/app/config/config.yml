@@ -1,0 +1,145 @@
+imports:
+    - { resource: parameters.yml }
+    - { resource: security.yml }
+    - { resource: services.yml }
+
+# Put parameters here that don't need to change on each machine where the app is deployed
+# https://symfony.com/doc/current/best_practices/configuration.html#application-related-configuration
+parameters:
+    locale: en
+
+framework:
+    #esi: ~
+    #translator: { fallbacks: ['%locale%'] }
+    secret: '%secret%'
+    router:
+        resource: '%kernel.project_dir%/app/config/routing.yml'
+        strict_requirements: ~
+    form: ~
+    csrf_protection: ~
+    validation: { enable_annotations: true }
+    serializer: { enable_annotations: true }
+    templating:
+        engines: ['twig']
+    default_locale: '%locale%'
+    trusted_hosts: ~
+    session:
+        # https://symfony.com/doc/current/reference/configuration/framework.html#handler-id
+        handler_id: session.handler.native_file
+        save_path: '%kernel.project_dir%/var/sessions/%kernel.environment%'
+    fragments: ~
+    http_method_override: true
+    assets: ~
+    php_errors:
+        log: true
+
+# Twig Configuration
+twig:
+    debug: '%kernel.debug%'
+    strict_variables: '%kernel.debug%'
+
+# Doctrine Configuration
+doctrine:
+    dbal:
+        driver: pdo_mysql
+        host: '%database_host%'
+        port: '%database_port%'
+        dbname: '%database_name%'
+        user: '%database_user%'
+        password: '%database_password%'
+        charset: UTF8
+        # if using pdo_sqlite as your database driver:
+        #   1. add the path in parameters.yml
+        #     e.g. database_path: "%kernel.project_dir%/var/data/data.sqlite"
+        #   2. Uncomment database_path in parameters.yml.dist
+        #   3. Uncomment next line:
+        #path: '%database_path%'
+
+    orm:
+        auto_generate_proxy_classes: '%kernel.debug%'
+        naming_strategy: doctrine.orm.naming_strategy.underscore
+        auto_mapping: true
+
+# Swiftmailer Configuration
+swiftmailer:
+    transport: '%mailer_transport%'
+    host: '%mailer_host%'
+    username: '%mailer_user%'
+    password: '%mailer_password%'
+    spool: { type: memory }
+
+# Rabbitmq
+old_sound_rabbit_mq:
+    connections:
+        default:
+            host:     '%rabbitmq_host%'
+            port:     5672
+            user:     'guest'
+            password: 'guest'
+            vhost:    '/'
+            lazy:     false
+            connection_timeout: 5
+            read_write_timeout: 3
+    producers:
+        bulk_document:
+            connection:       default
+            exchange_options: {name: 'bulk-document', type: direct}
+            service_alias:    bulk_document_producer # no alias by default
+    consumers:
+        bulk_document:
+            connection:       default
+            exchange_options: {name: 'bulk-document', type: direct}
+            queue_options:    {name: 'bulk_document_queue'}
+            callback:         app.search.consumer.bulk_document
+
+
+# Elasticsearch
+fos_elastica:
+    serializer: ~
+    clients:
+        default: { host: "%elasticsearch_host%", port: 9200 }
+    indexes:
+        # attributes_.. has to be indexed first, leave to the top
+        attributes_en:
+            client: default
+            types:
+                attribute:
+                    mappings:
+                        Id:
+                            type: string
+                        label:
+                            type: string
+                        group:
+                            type: string
+                        sort_order:
+                            type: integer
+                        group_order:
+                            type: integer
+                        type:
+                            type: string
+
+        categories_en:
+            client: default
+            types:
+                category:
+                    mappings:
+                        category_id:
+                            type: string
+                            fields:
+                                raw:
+                                    type: string
+                                    index: not_analyzed
+                        category_name:
+                            type: string
+                            fields:
+                                raw:
+                                    type: string
+                                    index: not_analyzed
+                        category_description:
+                            type: string
+                            fields:
+                                raw:
+                                    type: string
+                                    index: not_analyzed
+                        category_order:
+                            type: integer

@@ -1,0 +1,3 @@
+http.cors.allow-origin: "*"
+http.cors.enabled: true 
+node.master: true

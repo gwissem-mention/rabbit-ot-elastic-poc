@@ -1,0 +1,45 @@
+version: '2'
+
+services:
+    mysql:
+        image: mysql/mysql-server
+        environment:
+            MYSQL_ROOT_PASSWORD: admin
+            MYSQL_DATABASE: search
+            MYSQL_USER: search
+            MYSQL_PASSWORD: search
+
+    rabbitmq:
+        image: rabbitmq:3-management
+        ports:
+            - "15672:15672"
+            - "5672:5672"
+        environment:
+            RABBITMQ_DEFAULT_USER: guest
+            RABBITMQ_DEFAULT_PASS: guest
+
+    app:
+        build: ./docker/php
+        working_dir: /srv
+        environment:
+            - SYMFONY_ENV
+        ports:
+            - 8080:80
+        links:
+            - mysql
+            - rabbitmq
+            - elk
+        volumes:
+            - ./search_api:/srv
+            - ~/.composer:/var/www/.composer
+
+    elk:
+        image: willdurand/elk
+        ports:
+            - 81:80
+            - 9200:9200
+        volumes:
+            - ./docker/elastic/elasticsearch.yml:/etc/elasticsearch/elasticsearch.yml
+            - ./elk/logstash:/etc/logstash
+            - ./elk/logstash/patterns:/opt/logstash/patterns
+
