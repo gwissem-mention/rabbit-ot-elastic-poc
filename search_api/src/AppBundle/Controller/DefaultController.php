@@ -35,7 +35,7 @@ class DefaultController extends Controller
         // Put whatever you want here
         $searchQuery = new Match();
         $searchQuery->setField('category_description', 'category');
-/*
+
         $functionScore = new FunctionScore();
         $functionScore->addDecayFunction(
             'gauss',
@@ -47,13 +47,14 @@ class DefaultController extends Controller
         );
         $functionScore->setQuery($searchQuery);
         $query->setQuery($functionScore);
-*/
 
-        $query->setQuery($searchQuery);
 
+        //$query->setQuery($searchQuery);
+
+        echo "<pre>";
 echo json_encode($query->getQuery()->toArray());
         $resultset = $search->search($query);
-        var_dump($resultset->count());
+        var_dump($resultset);
 
         return new Response('', 200);
     }
